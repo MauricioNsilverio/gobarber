@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
 
+import AppError from '../errors/AppError';
+
 import authConfig from '../config/auth';
 
 interface TokenPayload {
@@ -17,15 +19,16 @@ export default function ensureAuthenticated(
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {
-    throw new Error('JWT token not provided');
+    throw new AppError('JWT token not provided', 401);
   }
 
-  const [, token] = authHeader.split(' ');
+  // const [type, token] but we're not using the type
+  const [, token] = authHeader.split(' '); // here we're deleting "bearer"
 
   try {
     const decoded = verify(token, authConfig.jwt.secret);
 
-    const { sub } = decoded as TokenPayload;
+    const { sub } = decoded as TokenPayload; // forcing decoded to become the type TokenPayload
 
     request.user = {
       id: sub,
@@ -33,6 +36,6 @@ export default function ensureAuthenticated(
 
     return next();
   } catch {
-    throw new Error('Invalid JWT token');
+    throw new AppError('Invalid JWT token', 401);
   }
 }

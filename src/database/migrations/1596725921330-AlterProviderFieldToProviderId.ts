@@ -25,7 +25,7 @@ export default class AlterProviderFieldToProviderId1596639583699
         referencedColumnNames: ['id'],
         referencedTableName: 'users',
         onDelete: 'SET NULL',
-        onUpdate: 'CASCADE',
+        onUpdate: 'CASCADE', // in case the id changes, the provider_id also changes
       }),
     );
   }
